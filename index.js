@@ -17,14 +17,12 @@ app.use('/spotify', spotifyRoutes); // /spotify → shows top 10 + now playing
 
 // Spotify callback route
 app.get('/callback', async (req, res) => {
-    // extract the code from query
     const code = req.query.code;
   
     if (!code) {
       return res.status(400).send('Authorization code missing');
     }
   
-    // exchange code for access_token + refresh_token
     try {
       const response = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
         grant_type: 'authorization_code',
@@ -40,16 +38,18 @@ app.get('/callback', async (req, res) => {
   
       const { access_token, refresh_token } = response.data;
   
-      // Save tokens to memory (or database)
       global.accessToken = access_token;
       global.refreshToken = refresh_token;
   
       res.send('✅ Spotify Auth Successful! You can now visit /spotify');
     } catch (err) {
-      console.error(err.response.data || err.message);
-      res.status(500).send('Failed to authenticate with Spotify');
+      console.error('🔴 Error exchanging token:', err.response?.data || err.message);
+      res.status(500).json({
+        message: 'Failed to authenticate with Spotify',
+        error: err.response?.data || err.message,
+      });
     }
   });
-
+  
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
