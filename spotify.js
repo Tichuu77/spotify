@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
+    console.log('Fetching Spotify data...');
     const token = await getAccessToken();
 
     const [topTracksRes, nowPlayingRes] = await Promise.all([
