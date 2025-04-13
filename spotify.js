@@ -40,8 +40,9 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/pause', async (req, res) => {
+  const token = await getAccessToken();
   try {
-    const token = await getAccessToken();
+   
     await axios.put(
       'https://api.spotify.com/v1/me/player/pause',
       {},
@@ -49,16 +50,16 @@ router.put('/pause', async (req, res) => {
     );
     res.json({ message: 'Paused playback' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message ,token});
   }
 });
 
 router.put('/play', async (req, res) => {
   const { uri } = req.body;
   if (!uri) return res.status(400).json({ error: 'Track URI is required' });
-
+  const token = await getAccessToken();
   try {
-    const token = await getAccessToken();
+   
     await axios.put(
       'https://api.spotify.com/v1/me/player/play',
       { uris: [uri] },
@@ -66,7 +67,7 @@ router.put('/play', async (req, res) => {
     );
     res.json({ message: 'Playback started' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message ,token});
   }
 });
 
